@@ -33,7 +33,7 @@ const BootcampSchema = new moongose.Schema({
         //GeoJSON Point
         type: {
             type: String,
-            enum: ["point"],
+            enum: ["Point"],
             required: false,
         },
         coordinates: {
@@ -103,7 +103,7 @@ BootcampSchema.pre("save", async function (next) {
     const loc = await geocoder.geocode(this.address);
     console.log(loc[0]);
     this.location = {
-        type: "point",
+        type: "Point",
         // lang, lat
         coordinates: [loc[0].longitude, loc[0].latitude],
         formattedAddress: loc[0].formattedAddress,
