@@ -8,7 +8,13 @@ const Bootcamp = require("../models/Bootcamp");
 // @route   GET /api/v1/bootcamps
 // @access  Public
 module.exports.getBootcamps = asyncHandler(async (req, res, next) => {
-    const bootcamps = await Bootcamp.find();
+    let query;
+    let queryStr = JSON.stringify(req.query);
+    
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
+    query = Bootcamp.find(JSON.parse(queryStr));
+    console.log(queryStr);
+    const bootcamps = await query;
     res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps });
 });
 
@@ -16,6 +22,10 @@ module.exports.getBootcamps = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/bootcamps/:id
 // @access  Public
 module.exports.getBootcamp = asyncHandler(async (req, res, next) => {
+
+    let query;
+
+
     const bootcamp = await Bootcamp.findById(req.params.id);
     if (!bootcamp) {
         return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404));
@@ -74,7 +84,7 @@ module.exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     const bootcamps = await Bootcamp.find({
         location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
     });
-    
+
     res.status(200).json({
         success: true,
         count: bootcamps.length,
